@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adaptace veřejných prostranství na změnu klimatu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red:       #EA4E1B;
+    --green:     #088747;
+    --pink:      #F7B2C1;
+    --yellow:    #F9B233;
+    --blue:      #274FF8;
+    --blue-dark: #3027CD;
+    --white:     #FFFFFF;
+    --gray:      #EAEAEA;
+    --charcoal:  #333333;
+    --black:     #000000;
+    --c1: var(--green);
+    --c2: var(--blue);
+    --c3: var(--blue-dark);
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #f5f5f5;
+    color: var(--charcoal);
+    min-height: 100vh;
+  }
+
+  #app {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--white);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .sg  { font-family: 'Space Grotesk', sans-serif; }
+  .mt  { font-family: 'Montserrat', sans-serif; }
+  .label { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+  .mono  { font-family: 'Space Grotesk', sans-serif; font-weight: 500; }
+
+  /* ── VIEWS ── */
+  .view { display: none; padding: 2rem 1.5rem; }
+  .view.active { display: block; }
+
+  /* ── INTRO HEADER ── */
+  .intro-header {
+    background: var(--black);
+    margin: -2rem -1.5rem 2rem;
+    padding: 2rem 1.5rem;
+  }
+  .intro-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin: 8px 0 10px;
+  }
+  .intro-header p {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.7;
+    max-width: 540px;
+  }
+
+  /* ── PILL / BADGE ── */
+  .pill {
+    display: inline-block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+  .pill-red   { background: var(--red);   color: var(--white); }
+  .pill-green { background: var(--green); color: var(--white); }
+  .pill-blue  { background: var(--blue);  color: var(--white); }
+  .pill-dark  { background: var(--blue-dark); color: var(--white); }
+
+  /* ── STAT CARDS ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 2rem; }
+  .stat-card { border-radius: 10px; padding: 14px 16px; border: 2px solid; }
+  .stat-card .num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; margin-bottom: 3px; }
+  .stat-card .sub { font-size: 12px; opacity: 0.7; }
+
+  /* ── INFO BOX ── */
+  .info-box { background: var(--gray); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+  .info-box .box-label { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.6; margin-bottom: 10px; }
+  .phase-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .phase-row:last-child { margin-bottom: 0; }
+  .phase-row p { font-size: 13px; line-height: 1.55; }
+  .phase-row strong { font-family: 'Space Grotesk', sans-serif; }
+
+  /* ── START BUTTON ── */
+  .btn-start {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s;
+  }
+  .btn-start:hover { opacity: 0.88; }
+  .start-note { margin-top: 10px; font-size: 12px; opacity: 0.55; }
+
+  /* ── PHASE INDICATOR ── */
+  .phase-indicator {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .phase-step { display: flex; align-items: center; gap: 8px; }
+  .phase-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2.5px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .phase-dot.done, .phase-dot.active { color: var(--white); }
+  .phase-dot.todo { background: transparent !important; }
+  .phase-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .phase-sep { font-size: 16px; font-weight: 700; color: var(--gray); }
+  .phase-indicator .q-counter {
+    margin-left: auto;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.5;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { height: 4px; background: var(--gray); border-radius: 2px; margin-bottom: 2rem; overflow: hidden; }
+  .progress-bar  { height: 100%; border-radius: 2px; transition: width 0.35s ease; }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; align-items: center; }
+  .bc-tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(249,178,51,0.2);
+    border: 1px solid var(--yellow);
+    color: var(--charcoal);
+    border-radius: 4px;
+    padding: 3px 9px;
+  }
+  .bc-sep { color: var(--gray); font-size: 14px; font-weight: 700; }
+
+  /* ── QUESTION ── */
+  .question-block {
+    border-left: 4px solid;
+    padding-left: 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .question-block .phase-tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 5px;
+  }
+  .question-block h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--black);
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .question-block .hint { font-size: 13px; opacity: 0.65; line-height: 1.55; }
+
+  /* ── OPTIONS ── */
+  .options { display: grid; gap: 10px; margin-bottom: 1.5rem; }
+  .option-btn {
+    background: var(--white);
+    border: 1.5px solid var(--gray);
+    border-radius: 10px;
+    padding: 15px 18px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+  }
+  .option-btn:hover { border-color: rgba(0,0,0,0.3); }
+  .option-btn.selected { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+  .radio-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--gray);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .radio-inner { width: 8px; height: 8px; border-radius: 50%; background: var(--white); display: none; }
+  .option-btn.selected .radio-dot { border-color: var(--white); background: rgba(255,255,255,0.25); }
+  .option-btn.selected .radio-inner { display: block; }
+  .option-content { flex: 1; }
+  .option-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 3px; }
+  .option-text { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; transition: color 0.15s; }
+  .option-desc { font-size: 12px; line-height: 1.55; opacity: 0.7; transition: color 0.15s; }
+  .option-btn.selected .option-desc { opacity: 0.82; color: var(--white); }
+  .level-hint {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── NAV BUTTONS ── */
+  .nav-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn-proceed {
+    border: none; border-radius: 8px;
+    padding: 13px 28px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+  }
+  .btn-proceed:disabled { cursor: not-allowed; opacity: 0.5; background: var(--gray); color: var(--charcoal); }
+  .btn-back {
+    background: transparent; border: none;
+    color: var(--charcoal);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; opacity: 0.55; padding: 4px 0;
+  }
+  .btn-back:hover { opacity: 1; }
+
+  /* ── RESULT ── */
+  .result-header {
+    margin: -2rem -1.5rem 1.75rem;
+    padding: 1.5rem 1.5rem;
+  }
+  .result-header .result-meta {
+    display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .result-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .result-header .subtitle { font-size: 13px; color: var(--white); opacity: 0.85; line-height: 1.6; max-width: 520px; }
+
+  .profile-box { background: var(--gray); border-radius: 10px; padding: 14px 18px; margin-bottom: 1.5rem; }
+  .profile-box .box-label { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .profile-tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 600;
+    background: var(--white);
+    border: 1.5px solid var(--gray);
+    color: var(--charcoal);
+    border-radius: 5px; padding: 4px 10px;
+  }
+
+  .meta-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .meta-card { background: var(--gray); border-radius: 8px; padding: 12px 14px; }
+  .meta-card .mc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.55; margin-bottom: 3px; font-family: 'Space Grotesk', sans-serif; }
+  .meta-card .mc-val { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: var(--black); line-height: 1.4; }
+
+  .description {
+    font-size: 14px; line-height: 1.75; margin-bottom: 1.75rem;
+    border-left: 3px solid;
+    padding-left: 1rem;
+  }
+
+  .steps-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+  .steps-list { display: grid; gap: 10px; margin-bottom: 1.75rem; }
+  .step-item { display: flex; gap: 14px; align-items: flex-start; background: var(--gray); border-radius: 8px; padding: 14px 16px; }
+  .step-num {
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 700;
+    color: var(--white);
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--black); margin-bottom: 3px; }
+  .step-desc { font-size: 13px; line-height: 1.6; opacity: 0.8; }
+
+  .next-step-box { border-radius: 10px; padding: 16px 18px; margin-bottom: 1.5rem; border: 1.5px solid; }
+  .next-step-box .ns-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 5px; }
+  .next-step-box p { font-size: 14px; line-height: 1.7; color: var(--black); }
+
+  .upgrade-box { display: flex; gap: 12px; align-items: flex-start; background: var(--gray); border-radius: 8px; padding: 14px 16px; margin-bottom: 1.5rem; }
+  .upgrade-box .arrow { font-size: 18px; flex-shrink: 0; margin-top: 1px; color: var(--yellow); }
+  .upgrade-box p { font-size: 13px; line-height: 1.6; }
+
+  /* SOURCES */
+  .section-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.6; margin-bottom: 10px; color: var(--charcoal); }
+  .sources-list { display: grid; gap: 7px; margin-bottom: 1.5rem; }
+  .source-row { display: flex; gap: 10px; align-items: baseline; font-size: 13px; }
+  .source-tag { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 4px; flex-shrink: 0; }
+
+  /* LITERATURE */
+  .lit-section { border-top: 2px solid var(--gray); padding-top: 1.5rem; margin-bottom: 1.5rem; }
+  .lit-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+  .lit-list { display: grid; gap: 10px; }
+  .lit-item { background: var(--gray); border-radius: 8px; padding: 14px 16px; border-left: 3px solid; }
+  .lit-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; color: var(--black); margin-bottom: 2px; }
+  .lit-author { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 500; margin-bottom: 6px; letter-spacing: 0.04em; }
+  .lit-desc { font-size: 13px; line-height: 1.6; opacity: 0.8; margin-bottom: 5px; }
+  .lit-url { font-family: 'Space Grotesk', sans-serif; font-size: 11px; opacity: 0.55; }
+
+  .btn-show-more {
+    margin-top: 12px; background: transparent;
+    border: 1.5px solid;
+    border-radius: 7px; padding: 8px 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+
+  /* FOOTER ACTIONS */
+  .result-footer { border-top: 1px solid var(--gray); padding-top: 1.25rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn-restart {
+    background: var(--black); color: var(--white); border: none;
+    border-radius: 7px; padding: 10px 22px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer;
+  }
+  .btn-edit {
+    background: transparent; border: 1.5px solid var(--gray);
+    color: var(--charcoal); border-radius: 7px; padding: 10px 18px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .footer-contact { margin-left: auto; font-size: 12px; opacity: 0.6; }
+
+  @media (max-width: 480px) {
+    .stat-grid { grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .stat-card .num { font-size: 16px; }
+    .meta-grid { grid-template-columns: 1fr 1fr; }
+    .meta-grid .meta-card:last-child { grid-column: span 2; }
+  }
+</style>
+</head>
+<body
+<div id="app">
+
+  <!-- ── INTRO ── -->
+  <div id="view-intro" class="view active">
+    <div class="intro-header">
+      <img src="Be_Ready_logo.png" style="height:150px; margin-bottom:12px; display:block;">
+      <span class="pill pill-red">Nástroj pro zastupitele obcí</span>
+      <h1>Adaptace veřejných prostranství<br>na změnu klimatu</h1>
+      <p>Průvodce diagnostikuje klimatickou výzvu vaší obce a nasměruje vás k odpovídajícímu řešení — od rychlých opatření přes krajinářský průzkum až po urbanistickou transformaci.</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card" style="border-color:var(--green);background:rgba(8,135,71,0.05)">
+        <div class="num" style="color:var(--green)">2–4 otázky</div>
+        <div class="sub">Rychlá diagnóza</div>
+      </div>
+      <div class="stat-card" style="border-color:var(--blue);background:rgba(39,79,248,0.05)">
+        <div class="num" style="color:var(--blue)">3 úrovně</div>
+        <div class="sub">Přizpůsobená řešení</div>
+      </div>
+      <div class="stat-card" style="border-color:var(--blue-dark);background:rgba(48,39,205,0.05)">
+        <div class="num" style="color:var(--blue-dark)">25+ zdrojů</div>
+        <div class="sub">CI2, LifeTree, NEB…</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="box-label">Jak průvodce funguje</div>
+      <div class="phase-row">
+        <span class="pill pill-red" style="flex-shrink:0;margin-top:2px">Fáze 1</span>
+        <p><strong>Výzva</strong> — Teplo, záplavy nebo sucho — kde a jak naléhavě?</p>
+      </div>
+      <div class="phase-row">
+        <span class="pill pill-blue" style="flex-shrink:0;margin-top:2px">Fáze 2</span>
+        <p><strong>Kapacity</strong> — Rozpočet, odbornost a kde potřebujete pomoc.</p>
+      </div>
+      <div class="phase-row" style="margin-bottom:0">
+        <span class="pill pill-dark" style="flex-shrink:0;margin-top:2px">Fáze 3</span>
+        <p><strong>Záměr</strong> — Rychlé výsledky, odborný plán nebo transformace?</p>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startApp()">Zahájit průvodce →</button>
+    <p class="start-note">2–4 otázky · Přibližně 2 minuty · Vaše odpovědi nejsou nikam odesílány</p>
+  </div>
+
+  <!-- ── QUESTION ── -->
+  <div id="view-question" class="view">
+    <div class="phase-indicator" id="phase-indicator"></div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <div class="question-block" id="question-block">
+      <div class="phase-tag" id="q-phase-tag"></div>
+      <h2 id="q-text"></h2>
+      <p class="hint" id="q-hint"></p>
+    </div>
+    <div class="options" id="options-list"></div>
+    <div class="nav-row">
+      <button class="btn-proceed" id="btn-proceed" disabled onclick="proceed()">Pokračovat →</button>
+      <button class="btn-back" id="btn-back" onclick="goBack()">← Úvod</button>
+    </div>
+  </div>
+
+  <!-- ── RESULT ── -->
+  <div id="view-result" class="view">
+    <div class="result-header" id="result-header">
+      <div class="result-meta" id="result-meta"></div>
+      <h2 id="result-title"></h2>
+      <p class="subtitle" id="result-subtitle"></p>
+    </div>
+    <div class="breadcrumb" id="result-breadcrumb"></div>
+    <div class="profile-box" id="profile-box">
+      <div class="box-label" id="profile-label"></div>
+      <div class="profile-tags" id="profile-tags"></div>
+    </div>
+    <div class="meta-grid" id="meta-grid"></div>
+    <p class="description" id="result-desc"></p>
+    <div id="steps-section"></div>
+    <div class="next-step-box" id="next-step-box">
+      <div class="ns-label" id="ns-label"></div>
+      <p id="next-step-text"></p>
+    </div>
+    <div id="upgrade-box"></div>
+    <div class="sources-list" id="sources-list" style="margin-bottom:0"></div>
+    <div style="margin-bottom:1.5rem"></div>
+    <div class="lit-section" id="lit-section"></div>
+    <div class="result-footer">
+      <button class="btn-restart" onclick="restart()">← Začít znovu</button>
+      <button class="btn-edit" onclick="editAnswers()">← Upravit odpovědi</button>
+      <span class="footer-contact"><strong>JINAG</strong> — jinag.eu &nbsp;·&nbsp; <strong>CoolRegion</strong> — data.coolregion.eu</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+
+const TREE = {
+  problem: {
+    fazeLabel:"Porozumění výzvě", fazeIndex:0,
+    otazka:"Jaký klimatický problém je ve vaší obci nejviditelnější?",
+    napoveda:"Vyberte výzvu, která dnes nejvíce ovlivňuje vaše obyvatele.",
+    moznosti:[
+      {id:"teplo",   text:"Nadměrné vedro a přehřívání prostorů",         popis:"Tepelný ostrov, chybí stín, obyvatelé se vyhýbají venku pobývat",  next:"nalehavost_ostatni"},
+      {id:"dest",    text:"Přívalové srážky, záplavy a rychlý odtok vody", popis:"Přetížená kanalizace, zaplavené ulice, srážky se nevyužívají",      next:"nalehavost_ostatni"},
+      {id:"sucho",   text:"Sucho, umírající nebo chybějící zeleň",         popis:"Stresovaná vegetace, chřadnoucí stromy, nedostatek vody pro zálivku",next:"nalehavost_ostatni"},
+      {id:"vsechno", text:"Kombinace více klimatických stresů najednou",   popis:"Vedro, záplavy i sucho — obec řeší více výzev současně",            next:"nalehavost_vsechno"},
+    ],
+  },
+  nalehavost_vsechno:{
+    fazeLabel:"Porozumění výzvě", fazeIndex:0,
+    otazka:"Jak naléhavě obyvatelé vnímají kombinaci těchto problémů?",
+    napoveda:"Při kombinaci více výzev je naléhavost klíčovým faktorem pro volbu přístupu.",
+    moznosti:[
+      {id:"kriticke",   text:"Způsobuje vážné škody nebo zdravotní rizika",  popis:"Škody na majetku, zdravotní dopady, viditelná krize",             next:{result:3}},
+      {id:"zhorsuje",   text:"Každý rok se situace zhoršuje, lidé si stěžují",popis:"Rostoucí nespokojenost, viditelné zhoršení prostředí",           next:"cil_vsechno"},
+      {id:"proaktivni", text:"Jednáme proaktivně — ještě žádná velká krize", popis:"Chceme být před problémem o krok napřed",                         next:"cil_vsechno"},
+    ],
+  },
+  cil_vsechno:{
+    fazeLabel:"Váš záměr", fazeIndex:2,
+    otazka:"Co je pro vaši obec v tuto chvíli nejdůležitější?",
+    napoveda:"Zvolte, co je nejupřímnější — ne co zní nejambiciózněji.",
+    moznosti:[
+      {id:"transformace",text:"Komplexní dlouhodobá proměna celé obce",  popis:"Zásadně přeměnit fungování veřejných prostranství a infrastruktury",next:{result:3}},
+      {id:"rychle",      text:"Viditelné výsledky ještě tuto sezónu",    popis:"Něco, co obyvatelé rychle uvidí, využijí a ocení",                  next:"rozpocet_vsechno"},
+      {id:"plan",        text:"Nejprve odborná analýza a plán",          popis:"Porozumět celkovému obrazu před přijetím zásadních závazků",         next:"rozpocet_vsechno"},
+    ],
+  },
+  rozpocet_vsechno:{
+    fazeLabel:"Vaše kapacity", fazeIndex:1,
+    otazka:"Jaký rozpočet je vaše obec schopna reálně mobilizovat?",
+    napoveda:"Zahrňte i dotace nebo prostředky EU, o které se momentálně ucházíte.",
+    moznosti:[
+      {id:"maly",   text:"Do 500 000 Kč",              popis:"Malé cílené intervence z provozního rozpočtu",             next:{result:2}},
+      {id:"stredni",text:"500 000 – 2 500 000 Kč",    popis:"Výraznější projekt s odbornou podporou a ev. dotací",       next:{result:2}},
+      {id:"velky",  text:"2 500 000 – 12 000 000 Kč", popis:"Významná transformace, pravděpodobně s dotační podporou",   next:{result:3}},
+      {id:"velky2", text:"Nad 12 000 000 Kč",         popis:"Zásadní investice se spolufinancováním EU nebo státu",      next:{result:3}},
+    ],
+  },
+  nalehavost_ostatni:{
+    fazeLabel:"Porozumění výzvě", fazeIndex:0,
+    otazka:"Jak naléhavě obyvatelé tento problém pociťují?",
+    napoveda:"Buďte upřímní — tato odpověď přímo určuje doporučený postup.",
+    moznosti:[
+      {id:"kriticke",   text:"Způsobuje vážné škody nebo zdravotní rizika",  popis:"Škody na majetku, zdravotní dopady, viditelná krize",             next:"kde_ostatni"},
+      {id:"zhorsuje",   text:"Každý rok se situace zhoršuje, lidé si stěžují",popis:"Rostoucí nespokojenost, viditelné zhoršení prostředí",           next:{result:2}},
+      {id:"proaktivni", text:"Jednáme proaktivně — ještě žádná velká krize", popis:"Chceme být před problémem o krok napřed",                         next:"kapacita_ostatni"},
+    ],
+  },
+  kde_ostatni:{
+    fazeLabel:"Porozumění výzvě", fazeIndex:0,
+    otazka:"Kde se problém projevuje nejcitelněji?",
+    napoveda:"Rozsah zasaženého území určuje, zda potřebujete systémový nebo lokální přístup.",
+    moznosti:[
+      {id:"vsude",   text:"Napříč celou obcí — systémový problém",   popis:"Žádné jedno místo — je to o celkové klimatické odolnosti území", next:{result:3}},
+      {id:"namesti", text:"Centrální náměstí nebo veřejný plac",     popis:"Konkrétní plocha, která naléhavě potřebuje pozornost",           next:{result:2}},
+      {id:"ulice",   text:"Ulice a silniční koridory",               popis:"Liniové prostory — přehřáté, bez stínu, špatně odvodněné",      next:{result:2}},
+      {id:"parky",   text:"Parky a zelené plochy",                   popis:"Stávající zeleň, která trpí, nebo oblasti, kde výrazně chybí",  next:{result:2}},
+      {id:"sidliste",text:"Sídlištní zástavba a vnitroblky",         popis:"Veřejná zeleň na sídlišti neplní svou funkci",                  next:{result:2}},
+    ],
+  },
+  kapacita_ostatni:{
+    fazeLabel:"Vaše kapacity", fazeIndex:1,
+    otazka:"Jakou odbornou kapacitu vaše obec disponuje?",
+    napoveda:"Přemýšlejte o technických zaměstnancích a jejich relevantních zkušenostech.",
+    moznosti:[
+      {id:"silna",   text:"Zvládneme to interně",                        popis:"Zaměstnanci s technickým zázemím relevantním pro tuto výzvu",    next:"cil_ostatni"},
+      {id:"castecna",text:"Máme odborníky, ale ne pro klimatická témata",popis:"Technický personál bez zkušeností s klimatickou adaptací",       next:{result:2}},
+      {id:"zadna",   text:"Potřebujeme plnou externí podporu",           popis:"Žádná relevantní odborná kapacita uvnitř úřadu",                 next:{result:2}},
+    ],
+  },
+  cil_ostatni:{
+    fazeLabel:"Váš záměr", fazeIndex:2,
+    otazka:"Co je pro vaši obec v tuto chvíli nejdůležitější?",
+    napoveda:"Máte silnou interní kapacitu — co s ní chcete v tuto sezónu dosáhnout?",
+    moznosti:[
+      {id:"rychle",      text:"Viditelné výsledky ještě tuto sezónu",   popis:"Něco, co obyvatelé rychle uvidí, využijí a ocení",               next:{result:1}},
+      {id:"plan",        text:"Nejprve odborná analýza a plán",         popis:"Porozumět celkovému obrazu před přijetím zásadních závazků",      next:{result:2}},
+      {id:"transformace",text:"Komplexní dlouhodobá proměna celé obce", popis:"Zásadně přeměnit fungování veřejných prostranství a infrastruktury",next:{result:2}},
+    ],
+  },
+};
+
+const NODE_LABELS = {
+  problem:             {teplo:"Přehřívání",       dest:"Záplavy",       sucho:"Sucho a zeleň",  vsechno:"Kombinace stresů"},
+  nalehavost_vsechno:  {kriticke:"Kritické",      zhorsuje:"Zhoršuje se",proaktivni:"Proaktivní"},
+  nalehavost_ostatni:  {kriticke:"Kritické",      zhorsuje:"Zhoršuje se",proaktivni:"Proaktivní"},
+  kde_ostatni:         {vsude:"Celá obec",         namesti:"Náměstí",    ulice:"Ulice",          parky:"Parky",    sidliste:"Sídliště"},
+  cil_vsechno:         {rychle:"Rychlé výsledky", plan:"Odborný plán",  transformace:"Transformace"},
+  cil_ostatni:         {rychle:"Rychlé výsledky", plan:"Odborný plán",  transformace:"Transformace"},
+  kapacita_ostatni:    {silna:"Silná interní",    castecna:"Částečná",  zadna:"Žádná"},
+  rozpocet_vsechno:    {maly:"Do 500 tis.",       stredni:"500–2,5 mil.",velky:"2,5–12 mil.",   velky2:"Nad 12 mil."},
+};
+
+const PROBLEM_KROKY = {
+  teplo:{
+    1:[{n:"Okamžité stínění prioritních míst",p:"Plachtové stíny, pergoly, slunečníky — bez stavebního povolení, přemístitelné. Ideální pro náměstí, hřiště a zastávky."},
+       {n:"Vodní a chladicí prvky",p:"Mlhoviště, pitné fontánky, malé vodní prvky. Dle metodiky HDV — vhodné pro náměstí i parkové plochy."},
+       {n:"Strategická výsadba klimaticky odolných stromů",p:"30letý javor za horkého dne odpaří až 50 litrů vody. Prioritizujte místa bez stínu, kde lidé tráví čas."},
+       {n:"Mobilní a kontejnerová zeleň",p:"Velké truhlíky a kontejnerové stromy — zlepšují mikroklima a umožňují testovat rozmístění před trvalou výsadbou."}],
+    2:[{n:"Mikroklimatická analýza a mapa tepelných ostrovů",p:"Mapování přehřátých míst, větrných koridorů a distribuce stínu. Základ dle metodiky Voda ve městě."},
+       {n:"Inventarizace zeleně a pasport dřevin",p:"Hodnotu každého stromu lze spočítat kalkulačkou AOPK ČR — základ pro odůvodnění investic a dotačních žádostí."},
+       {n:"Návrh modro-zelené infrastruktury pro chlazení",p:"Propojený systém stromů, dešťových záhonů a vodních prvků. Každý strom potřebuje 15–30 m³ prokořenitelného prostoru (BGG standard)."}],
+    3:[{n:"Chlazení jako závazná podmínka soutěže",p:"Zadání architektonické soutěže musí zahrnovat modro-zelenou infrastrukturu a HDV jako závazné podmínky — ne doplněk."},
+       {n:"Redesign ulic s integrovaným stíněním a zelenou fasádou",p:"Ulice jako příležitost pro BGG infrastrukturu: prokořenitelné substráty, biouhel, regulace odtoku a stromořadí."}],
+  },
+  dest:{
+    1:[{n:"Propustné povrchy a dešťové záhony",p:"Štěrkový trávník zasakuje o třetinu více než běžný. Propustná dlažba zachytí srážky přímo v místě dopadu."},
+       {n:"Odpojení svodů ze střech do vsaku nebo záhonu",p:"Jednoduché a levné opatření — voda ze střech zásobuje záhony nebo vsakuje místo odtékání do přetížené kanalizace."},
+       {n:"Identifikace kritických míst odtoku",p:"Zjistit, kde voda škodí, a nainstalovat příčné žlaby nebo přesměrovat odtok do vegetace."}],
+    2:[{n:"HDV analýza a problémová mapa odtoku",p:"Komplexní analýza dle metodiky Voda ve městě — mapování nepropustných ploch, odlehčovacích komor a rizikových míst záplav."},
+       {n:"Návrh systému hospodaření se srážkovými vodami",p:"Akumulační nádrže, vsakovací průlehy, dešťové záhony jako provázaný systém — ne izolované prvky."},
+       {n:"Pasport kanalizace a analýza oddělitelnosti",p:"Zjistit, kde lze oddělit splaškovou a dešťovou kanalizaci a omezit přetěžování ČOV při přívalech."}],
+    3:[{n:"HDV jako závazná podmínka urbanistické soutěže",p:"Každý park, parkoviště, dvorek a hřiště musí řešit hospodaření se srážkovou vodou dle katalogu opatření HDV."},
+       {n:"Koordinace se správci sítí od prvního dne",p:"Sítě a kanalizace je třeba koordinovat od začátku projektu — ne řešit dodatečně po návrhu."}],
+  },
+  sucho:{
+    1:[{n:"Strategická výsadba klimaticky odolných dřevin",p:"Klimaticky odolné druhy: lípa, dub, platan, jerlín. Zálivka je klíčová v prvních 3–5 letech."},
+       {n:"Mobilní nádrže na dešťovou vodu pro zálivku",p:"Akumulace dešťové vody ze střech pro zálivku veřejné zeleně místo plýtvání pitnou vodou z vodovodu."},
+       {n:"Zahájit evidenci zeleně — pasport a plán údržby",p:"Obec bez pasportu neví, co má, natož jak o to pečovat. Bez plánu údržby zeleň systematicky chřadne."}],
+    2:[{n:"Dendrologický průzkum a inventarizace zeleně",p:"Zjistit stav každého stromu, druhové složení a výhled. Základ pro generel zeleně, pasport a plán péče."},
+       {n:"Generel zeleně a plán výsadeb",p:"Strategický dokument určující, kde a co sázet v horizontu 10–20 let. Musí zahrnovat klimaticky odolné druhy."},
+       {n:"Návrh zálivky ze srážkových vod",p:"Propojit výsadby s akumulací dešťové vody — stromy bez přístupu srážkové vody jen přežívají."}],
+    3:[{n:"Systémová péče o zeleň jako součást transformace",p:"Plán údržby, pasport a dendrologický průzkum jsou podmínkou úspěchu od prvního dne."},
+       {n:"Multidisciplinární přístup ke zelené infrastruktuře",p:"Krajina, zeleň a hospodaření s vodou musí být řešeny jako jeden provázaný systém."}],
+  },
+  vsechno:{
+    1:[{n:"Prioritizovat jedno konkrétní místo a tam ukázat výsledek",p:"Při více problémech najednou: vybrat jednu lokalitu a demonstrovat výsledky. Hybnost a viditelnost jsou důležité."},
+       {n:"Základní dokumentace — zjistit, co obec vůbec má",p:"Pasport zeleně, přehled zpevněných ploch a stav kanalizace. Bez dat nelze ani plánovat, ani žádat o dotace."}],
+    2:[{n:"Komplexní analýza území — problémová mapa",p:"Mapování tepelných ostrovů, odtokových cest, stavu zeleně a nepropustných ploch jako podklad pro etapový plán."},
+       {n:"Etapový plán s propojením témat",p:"Teplo, voda i zeleň se navzájem ovlivňují — krajinářský architekt je klíčový pro jejich propojení."}],
+    3:[{n:"Meziodborová pracovní skupina od prvního dne",p:"Rezortismus je hlavní příčinou systémového selhání v péči o veřejný prostor."},
+       {n:"Systémová strategie klimatické adaptace",p:"Zpracovat místní adaptační strategii dle metodiky CI2 — analýza zranitelnosti, výběr opatření, implementační plán."}],
+  },
+};
+
+const RESULT_DATA = {
+  1:{
+    ac:"#088747", stitek:"Úroveň 1",
+    nazev:"Rychlá klimatická opatření",
+    podtitul:"Okamžitá, nákladově nenáročná opatření, která vaše obec může realizovat ještě tuto sezónu",
+    tym:"Pracovníci obce + místní dodavatelé", cas:"1–3 měsíce", rozpocet:"Do 500 000 Kč",
+    popis:"Vaše situace volá po praktických opatřeních s rychlým viditelným efektem. Nevyžadují složité výběrové řízení a zvládnete je řídit stávajícím personálem — ideální pro budování hybnosti a demonstraci aktivity směrem k obyvatelům.",
+    dalsiKrok:"Jakmile tato opatření přinesou výsledky, využijte je jako argument k poptávce krajinářského architekta pro dlouhodobější strategii — nebo podejte žádost o dotaci pro Úroveň 2.",
+    zdroje:[
+      {s:"Dotace",        t:"Státní fond životního prostředí — sfzp.cz"},
+      {s:"Inspirace CZ",  t:"Adapterra Awards — adapterra.cz"},
+      {s:"Inspirace EU",  t:"NEB Prizes — prizes.new-european-bauhaus.europa.eu"},
+      {s:"Odborník",      t:"Registr odborníků SZKT — szkt.cz"},
+      {s:"SZKT Speciál",  t:"Správa zeleně v kostce (zdarma PDF) — szkt.cz/vyrobek/zahrada-park-krajina-special-2025"},
+      {s:"Průvodce CI2",  t:"Jak na změnu klimatu v malých obcích — adaptace.klimasemeni.cz"},
+      {s:"Zálivka stromů",t:"Aplikace Zalej mě! — zapojení občanů do péče o stromy"},
+      {s:"Hodnota stromu",t:"Kalkulačka AOPK ČR — od2021.safetrees.cz/strom.html"},
+      {s:"Veřejné prostory",t:"LifeTreeCheck — lifetreecheck.eu/cs/library"},
+    ],
+    literatura:[
+      {titul:"O stromech v ulicích",              autor:"Kateřina Vídenová (ed.), Arnika 2022",  popis:"Praktické návody: výsadba stromu v ulici, zálivka, co hlídat při koupi stromů.",url:"arnika.org/o-stromech-v-ulicich"},
+      {titul:"Voda ve městě — Metodika HDV",      autor:"ČVUT & UJEP, certifikováno MŽP 2021",  popis:"Katalog 21 opatření pro hospodaření s dešťovou vodou — dešťové záhony, propustné dlažby, vodní prvky.",url:"lifetreecheck.eu/cs/library/voda-ve-meste"},
+      {titul:"Jak na změnu klimatu v malých městech a obcích",autor:"CI2, o. p. s., prosinec 2024",popis:"Průvodce pro samosprávy s kartami problémů. Tepelný ostrov (s. 15), Zpevněné plochy (s. 16), Nedostatek stínu (s. 17), Nefunkční parky (s. 20).",url:"adaptace.klimasemeni.cz"},
+      {titul:"Katalog přírodě blízkých opatření", autor:"Institut plánování a rozvoje hl. m. Prahy, 2021",popis:"Zelené střechy, dešťové záhony, průlehy a průsakové pásy.",url:"adaptacepraha.cz/katalog"},
+      {titul:"Metodické doporučení k sekání trávy",autor:"Climarchi / MŽP",popis:"Správa travnatých ploch s důrazem na biodiverzitu a snížení provozních nákladů.",url:"climarchibase.cz/publikace-metodiky"},
+      {titul:"Jak na udržitelné obce",            autor:"RIS — Regionální informační servis",    popis:"Praktický průvodce pro malé a střední obce — od energetiky po veřejný prostor a zeleň.",url:"risy.cz"},
+      {titul:"Kvalitní veřejné prostory",         autor:"LifeTreeCheck, 2023",                   popis:"Principy tvorby kvalitních veřejných prostorů zaměřené na pohodu obyvatel, přírodu a klimatickou odolnost.",url:"lifetreecheck.eu/cs/library/kvalitni-verejne-prostory"},
+      {titul:"Správa zeleně v kostce (ZPK Speciál 2025)",autor:"SZKT, 2025",popis:"Mimořádné vydání pro zastupitele zodpovědné za správu zeleně. Ke stažení zdarma.",url:"szkt.cz/vyrobek/zahrada-park-krajina-special-2025"},
+    ],
+  },
+  2:{
+    ac:"#274FF8", stitek:"Úroveň 2",
+    nazev:"Krajinářsko-architektonický průzkum",
+    podtitul:"Objednejte odborného krajinářského architekta pro analýzu situace a komplexní plán opatření",
+    tym:"Krajinářský architekt + specialista na HDV", cas:"6–18 měsíců", rozpocet:"500 000 – 2 500 000 Kč",
+    popis:"Vaše situace vyžaduje zapojení odborného krajinářského architekta. Klíčové je propojit modrou a zelenou složku — stromy potřebují vodu a voda potřebuje stromy. Bez koordinace vznikají izolovaná řešení, která neplní svůj ekosystémový potenciál.",
+    dalsiKrok:"Krajinářský architekt identifikuje, zda je nutné zapojit silniční infrastrukturu nebo budovy — a vytvoří základ pro případný postup na Úroveň 3. Ověřte dostupné výzvy SFŽP a OPŽP.",
+    zdroje:[
+      {s:"Najít architekta",t:"Registr krajinářských architektů SZKT — szkt.cz/clenove"},
+      {s:"Standard výsadby",t:"Standard pro stromořadí IPR Praha — iprpraha.cz"},
+      {s:"HDV metodika",    t:"Voda ve městě (zdarma PDF) — vodavemeste.cz"},
+      {s:"Dotace",          t:"SFŽP + Nadace Partnerství — sfzp.cz | nadacepartnerstvi.cz"},
+      {s:"SZKT Speciál",    t:"Správa zeleně v kostce (zdarma PDF) — szkt.cz/vyrobek/zahrada-park-krajina-special-2025"},
+      {s:"Vzdělávání",      t:"Semináře Počítáme s vodou — pocitamesvodou.cz"},
+      {s:"Sídla a adaptace",t:"Adaptace sídel — adaptacesidel.cz"},
+      {s:"Co-design",       t:"Placemaking — lifetreecheck.eu/cs/library/placemaking-we-built-our-cities-around-places"},
+    ],
+    literatura:[
+      {titul:"Voda ve městě — Metodika HDV",      autor:"ČVUT & UJEP, certifikováno MŽP 2021",popis:"Kompletní procesní postup HDV: od koncepce přes zadání a projekci až po údržbu. Příklady z Litoměřic, Mikulova a Olomouce.",url:"lifetreecheck.eu/cs/library/voda-ve-meste"},
+      {titul:"Jak na změnu klimatu v malých městech a obcích",autor:"CI2, o. p. s., prosinec 2024",popis:"Relevantní karty: Absence evidence zeleně (s. 18), Přehřívání bez stromořadí (s. 19), Lokální přívalové povodně (s. 24), Rychlý odtok srážek (s. 25).",url:"adaptace.klimasemeni.cz"},
+      {titul:"BGG manuál Livable Street",         autor:"Edge (Švédsko), překlad K2N Landscape",popis:"Manuál modro-zeleno-šedé infrastruktury: prokořenitelné substráty, biouhel, regulace odtoku, koexistence se sítěmi.",url:"bluegreengrey.edges.se"},
+      {titul:"Klimaticky odolné a obyvatelné město",autor:"LifeTreeCheck, 2023",popis:"Publikace o tepelném ostrovu, zelené infrastruktuře a nástrojích pro hodnocení klimatické odolnosti.",url:"lifetreecheck.eu/cs/library/livable-and-resilient-city"},
+      {titul:"Jak připravit obec na klimatickou změnu",autor:"LifeTreeCheck, 2023",popis:"Od identifikace rizik přes výběr opatření po jejich implementaci a monitoring na úrovni obce.",url:"lifetreecheck.eu/cs/library/jak-pripravit-obec-na-klimatickou-zmenu"},
+      {titul:"Metodika plánování veřejných prostranství malých obcí",autor:"LifeTreeCheck, 2023",popis:"Procesní návod pro obce do 2 000 obyvatel — jak plánovat, zadávat a realizovat veřejná prostranství s ohledem na klima.",url:"lifetreecheck.eu/cs/library/metodika-planovani-verejnych-prostranstvi-obci"},
+      {titul:"Jak vytvářet veřejné prostory s lidmi a pro ně",autor:"LifeTreeCheck, 2023",popis:"Průvodce participativní tvorbou veřejných prostranství — metody zapojení obyvatel, komunitní workshopy.",url:"lifetreecheck.eu/cs/library/placemaking-we-built-our-cities-around-places"},
+      {titul:"Metodika tvorby místní adaptační strategie",autor:"CI2, o. p. s.",popis:"Návod pro zpracování místní adaptační strategie — analýza zranitelnosti, výběr opatření, implementační plán.",url:"adaptace.ci2.co.cz"},
+      {titul:"Klima a územní plán",               autor:"Arnika, 2023",popis:"Jak zapracovat klimatická opatření do územního plánování — zeleň, propustné povrchy, protipovodňová opatření.",url:"arnika.org/klima-a-uzemni-plan"},
+      {titul:"Správa zeleně v kostce (ZPK Speciál 2025)",autor:"SZKT, 2025",popis:"Klíčový zdroj pro zadání průzkumu a kontrolu kvality péče o zeleň. Ke stažení zdarma.",url:"szkt.cz/vyrobek/zahrada-park-krajina-special-2025"},
+    ],
+  },
+  3:{
+    ac:"#3027CD", stitek:"Úroveň 3",
+    nazev:"Multidisciplinární urbanistická transformace",
+    podtitul:"Architektonická soutěž integrující krajinu, infrastrukturu, budovy a zeleň jako jeden systém",
+    tym:"Krajinářští architekti · Architekti · Dopravní inženýři · Hydrologové · Ekologové", cas:"2–5 let", rozpocet:"Nad 2 500 000 Kč (obvykle s EU spolufinancováním)",
+    popis:"Rozsah vašich výzev vyžaduje komplexní, multidisciplinární přístup. Urbanistická soutěž přivádí specialisty, kteří společně vytvoří vizi, kde veřejný prostor, komunikace, budovy a příroda tvoří jeden integrovaný systém.",
+    dalsiKrok:"Začněte přípravou soutěžních podmínek za pomoci ČKA. Zřiďte meziodborovou pracovní skupinu — rezortismus je hlavní příčinou systémového selhání v péči o veřejný prostor.",
+    zdroje:[
+      {s:"Archit. soutěže",t:"Česká komora architektů — cka.cz"},
+      {s:"Krajinářství",   t:"SZKT — szkt.cz"},
+      {s:"HDV metodika",   t:"Voda ve městě (zdarma PDF) — vodavemeste.cz"},
+      {s:"Průvodce CI2",   t:"Jak na změnu klimatu v malých obcích — adaptace.klimasemeni.cz"},
+      {s:"EU dotace",      t:"LIFE Programme, Interreg, OPŽP — sfzp.cz"},
+      {s:"Inspirace CZ",   t:"Adapterra Awards — adapterra.cz"},
+      {s:"Inspirace EU",   t:"NEB Prizes — prizes.new-european-bauhaus.europa.eu"},
+      {s:"NEB standard",   t:"NEB STAR — nebstar.eu"},
+      {s:"EU projekt",     t:"BE-READY / Interreg Danube — interreg-danube.eu/projects/be-ready"},
+      {s:"Zadávání",       t:"Odpovědné veřejné zakázky — portal-vz.cz/co-je-ovz"},
+      {s:"Inspirace světová",t:"ArchDaily — archdaily.com"},
+    ],
+    literatura:[
+      {titul:"Voda ve městě — Metodika HDV",      autor:"ČVUT & UJEP, certifikováno MŽP 2021",popis:"Systémový pohled na HDV v celém městě: územní plán, ulice, parky, parkoviště, vnitroblok, hřbitov.",url:"lifetreecheck.eu/cs/library/voda-ve-meste"},
+      {titul:"Jak na změnu klimatu v malých městech a obcích",autor:"CI2, o. p. s., prosinec 2024",popis:"Relevantní: Nedostatek odborných zdrojů (s. 10), Efekt tepelného ostrova (s. 15), Nedostatečné propojení krajiny a sídla (s. 29), Absence izolační zeleně (s. 30).",url:"adaptace.klimasemeni.cz"},
+      {titul:"BGG manuál Livable Street",         autor:"Edge (Švédsko), překlad K2N Landscape",popis:"Průkopnický manuál BGG infrastruktury — použit v projektech Seifertovy ulice v Praze. Klíčový pro zadání soutěže.",url:"bluegreengrey.edges.se"},
+      {titul:"Modrozelená města",                 autor:"IEEP — Institut pro evropskou environmentální politiku",popis:"Analýza přínosů modrozelené infrastruktury pro česká města — ekonomické, sociální a ekosystémové benefity.",url:"ieep.cz"},
+      {titul:"Města a sídelní krajina ČR v době změny klimatu",autor:"CI2, o. p. s.",popis:"Systémový pohled na česká sídla v kontextu klimatické krize — analýza zranitelnosti, typy opatření.",url:"ci2.co.cz"},
+      {titul:"Naše krajina: adaptace krajiny na změnu klimatu",autor:"Nadace Via, 2. vydání 2024",popis:"Komplexní průvodce adaptací krajiny — od zemědělství a lesů po vodní toky a sídla.",url:"nadacevia.cz"},
+      {titul:"New European Bauhaus Handbook (NEBULA)",autor:"Evropská komise / Build Up, 2023",popis:"Metodická příručka NEB — krásné, udržitelné a inkluzivní veřejné prostory. Vhodné pro přípravu soutěží financovaných EU.",url:"build-up.ec.europa.eu"},
+      {titul:"NEB STAR — podpora kvality veřejné výstavby",autor:"NEB STAR, 2025",popis:"Rámec pro hodnocení kvality veřejné výstavby z hlediska NEB hodnot (krása, udržitelnost, inkluze).",url:"nebstar.eu"},
+      {titul:"Odpovědné zadávání veřejných zakázek",autor:"Ministerstvo pro místní rozvoj ČR",popis:"Jak zahrnout environmentální, sociální a inovační kritéria do veřejných zakázek na stavby a služby.",url:"portal-vz.cz/co-je-ovz"},
+      {titul:"Co-design v klimatické adaptaci (příklad z Budapešti)",autor:"Springer / Sustainability Science, 2025",popis:"Participativní co-design klimatických opatření — zkušenosti z Budapešti aplikovatelné na česká sídla.",url:"link.springer.com/article/10.1007/s43621-025-00975-7"},
+    ],
+  },
+};
+
+const PHASE_COLORS = ["#EA4E1B","#274FF8","#3027CD"];
+
+// ══════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════
+
+let history = [];
+let currentNode = null;
+let selected = null;
+let currentResult = null;
+let litExpanded = false;
+
+// ══════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════
+
+function getLabel(nodeId, answerId) {
+  return (NODE_LABELS[nodeId] || {})[answerId] || answerId;
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════════════════════════
+
+function startApp() {
+  history = []; selected = null; currentResult = null; litExpanded = false;
+  currentNode = "problem";
+  renderQuestion();
+  showView("view-question");
+}
+
+function restart() {
+  currentNode = null; history = []; selected = null; currentResult = null; litExpanded = false;
+  showView("view-intro");
+}
+
+function proceed() {
+  if (!selected) return;
+  const node = TREE[currentNode];
+  const choice = node.moznosti.find(m => m.id === selected);
+  history.push({nodeId: currentNode, answerId: selected});
+  selected = null;
+  if (choice.next && choice.next.result) {
+    currentResult = choice.next.result;
+    renderResult();
+    showView("view-result");
+  } else {
+    currentNode = choice.next;
+    renderQuestion();
+  }
+}
+
+function goBack() {
+  if (history.length === 0) { showView("view-intro"); return; }
+  const prev = history.pop();
+  currentNode = prev.nodeId;
+  selected = prev.answerId;
+  renderQuestion();
+}
+
+function editAnswers() {
+  if (history.length === 0) { showView("view-intro"); return; }
+  const prev = history.pop();
+  currentNode = prev.nodeId;
+  selected = prev.answerId;
+  currentResult = null;
+  renderQuestion();
+  showView("view-question");
+}
+
+function selectOption(id) {
+  selected = id;
+  // Update all buttons
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    const nodeId = currentNode;
+    const node = TREE[nodeId];
+    const isSelected = btn.dataset.id === id;
+    const choice = node.moznosti.find(m => m.id === btn.dataset.id);
+    const ac = isSelected ? getNodeColor(node) : null;
+
+    btn.classList.toggle('selected', isSelected);
+    if (isSelected) {
+      btn.style.background = ac;
+      btn.style.borderColor = ac;
+      btn.style.boxShadow = `0 0 0 3px ${hexAlpha(ac, 0.15)}`;
+      btn.querySelector('.option-text').style.color = '#FFFFFF';
+    } else {
+      btn.style.background = '#FFFFFF';
+      btn.style.borderColor = '#EAEAEA';
+      btn.style.boxShadow = 'none';
+      btn.querySelector('.option-text').style.color = '#000000';
+    }
+  });
+  // Enable proceed button
+  const btn = document.getElementById('btn-proceed');
+  const ac = getNodeColor(TREE[currentNode]);
+  btn.disabled = false;
+  btn.style.background = ac;
+  btn.style.color = '#FFFFFF';
+}
+
+function getNodeColor(node) {
+  return PHASE_COLORS[node.fazeIndex] || PHASE_COLORS[0];
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER QUESTION
+// ══════════════════════════════════════════════════════════════════
+
+function renderQuestion() {
+  const node = TREE[currentNode];
+  const ac = getNodeColor(node);
+
+  // Phase indicator
+  const labels = ["Výzva","Kapacity","Záměr"];
+  const activePhase = node.fazeIndex;
+  const donePhases = new Set(history.map(h => TREE[h.nodeId]?.fazeIndex).filter(f => f !== undefined && f !== activePhase));
+
+  let phaseHtml = '';
+  for (let f = 0; f < 3; f++) {
+    const isDone = donePhases.has(f);
+    const isActive = f === activePhase;
+    const c = PHASE_COLORS[f];
+    const dotBg = (isDone || isActive) ? c : 'transparent';
+    const dotColor = (isDone || isActive) ? '#FFFFFF' : c;
+    const opacity = (!isDone && !isActive) ? '0.28' : '1';
+    const nameColor = isActive ? c : '#333333';
+    const nameWeight = isActive ? '700' : '500';
+    phaseHtml += `
+      <div class="phase-step" style="opacity:${opacity}">
+        <div class="phase-dot ${isDone?'done':isActive?'active':'todo'}" style="border-color:${c};background:${dotBg};color:${dotColor}">${isDone?'✓':f+1}</div>
+        <span class="phase-name" style="color:${nameColor};font-weight:${nameWeight}">${labels[f]}</span>
+      </div>`;
+    if (f < 2) phaseHtml += `<span class="phase-sep">›</span>`;
+  }
+  phaseHtml += `<div class="q-counter">Otázka ${history.length + 1}</div>`;
+  document.getElementById('phase-indicator').innerHTML = phaseHtml;
+
+  // Progress bar
+  const pct = Math.min(((history.length + (selected ? 1 : 0)) / 4) * 100, 100);
+  const bar = document.getElementById('progress-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = ac;
+
+  // Breadcrumb
+  renderBreadcrumb('breadcrumb');
+
+  // Question
+  const qBlock = document.getElementById('question-block');
+  qBlock.style.borderLeftColor = ac;
+  document.getElementById('q-phase-tag').textContent = node.fazeLabel;
+  document.getElementById('q-phase-tag').style.color = ac;
+  document.getElementById('q-text').textContent = node.otazka;
+  document.getElementById('q-hint').textContent = node.napoveda;
+
+  // Options
+  let optHtml = '';
+  node.moznosti.forEach(m => {
+    const isResult = m.next && m.next.result;
+    const levelN = isResult ? m.next.result : null;
+    const levelColors = {1:'#088747',2:'#274FF8',3:'#3027CD'};
+    const lc = levelColors[levelN];
+    const isSelected = selected === m.id;
+    const btnBg    = isSelected ? ac : '#FFFFFF';
+    const btnBorder= isSelected ? ac : '#EAEAEA';
+    const btnShadow= isSelected ? `0 0 0 3px ${hexAlpha(ac,0.15)}` : 'none';
+    const textColor= isSelected ? '#FFFFFF' : '#000000';
+    const descColor= isSelected ? 'rgba(255,255,255,0.82)' : 'rgba(51,51,51,0.7)';
+
+    let levelBadge = '';
+    if (isResult) {
+      const badgeBg = isSelected ? 'rgba(255,255,255,0.2)' : hexAlpha(lc, 0.12);
+      const badgeColor = isSelected ? '#FFFFFF' : lc;
+      levelBadge = `<span class="level-hint" style="background:${badgeBg};color:${badgeColor}">Úroveň ${levelN}</span>`;
+    }
+
+    optHtml += `
+      <button class="option-btn${isSelected?' selected':''}" data-id="${m.id}"
+        style="background:${btnBg};border-color:${btnBorder};box-shadow:${btnShadow}"
+        onclick="selectOption('${m.id}')">
+        <div class="radio-dot" style="${isSelected?`border-color:#FFFFFF;background:rgba(255,255,255,0.25)`:`border-color:#EAEAEA`}">
+          <div class="radio-inner" style="${isSelected?'display:block':'display:none'}"></div>
+        </div>
+        <div class="option-content">
+          <div class="option-head">
+            <span class="option-text" style="color:${textColor}">${m.text}</span>
+            ${levelBadge}
+          </div>
+          <div class="option-desc" style="color:${descColor}">${m.popis}</div>
+        </div>
+      </button>`;
+  });
+  document.getElementById('options-list').innerHTML = optHtml;
+
+  // Proceed button
+  const proceedBtn = document.getElementById('btn-proceed');
+  if (selected) {
+    proceedBtn.disabled = false;
+    proceedBtn.style.background = ac;
+    proceedBtn.style.color = '#FFFFFF';
+  } else {
+    proceedBtn.disabled = true;
+    proceedBtn.style.background = '#EAEAEA';
+    proceedBtn.style.color = '#333333';
+  }
+
+  // Back button
+  const backBtn = document.getElementById('btn-back');
+  backBtn.textContent = history.length === 0 ? '← Úvod' : '← Předchozí';
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDER RESULT
+// ══════════════════════════════════════════════════════════════════
+
+function renderResult() {
+  const data = RESULT_DATA[currentResult];
+  const ac = data.ac;
+  const problemAnswer = (history.find(h => h.nodeId === 'problem') || {}).answerId || 'vsechno';
+  const steps = (PROBLEM_KROKY[problemAnswer] || PROBLEM_KROKY.vsechno)[currentResult] || [];
+
+  // Header
+  const header = document.getElementById('result-header');
+  header.style.background = ac;
+  document.getElementById('result-meta').innerHTML = `
+    <span class="pill" style="background:rgba(255,255,255,0.2);color:#FFFFFF">${data.stitek}</span>
+    <span style="font-size:12px;color:rgba(255,255,255,0.75)">Doporučení pro vaši obec</span>`;
+  document.getElementById('result-title').textContent = data.nazev;
+  document.getElementById('result-subtitle').textContent = data.podtitul;
+
+  // Breadcrumb
+  renderBreadcrumb('result-breadcrumb');
+
+  // Profile
+  document.getElementById('profile-label').style.color = ac;
+  document.getElementById('profile-label').textContent = 'Váš profil';
+  const profileBox = document.getElementById('profile-box');
+  profileBox.style.borderLeft = `4px solid ${ac}`;
+  let tagHtml = '';
+  history.forEach(h => {
+    const n = TREE[h.nodeId];
+    if (!n) return;
+    const choice = n.moznosti.find(m => m.id === h.answerId);
+    tagHtml += `<span class="profile-tag">${choice?.text || h.answerId}</span>`;
+  });
+  document.getElementById('profile-tags').innerHTML = tagHtml;
+
+  // Meta grid
+  document.getElementById('meta-grid').innerHTML = [
+    {s:'Tým',v:data.tym},{s:'Časový rámec',v:data.cas},{s:'Orientační rozpočet',v:data.rozpocet}
+  ].map(m=>`<div class="meta-card"><div class="mc-label">${m.s}</div><div class="mc-val">${m.v}</div></div>`).join('');
+
+  // Description
+  const desc = document.getElementById('result-desc');
+  desc.textContent = data.popis;
+  desc.style.borderLeftColor = ac;
+
+  // Steps
+  let stepsHtml = '';
+  if (steps.length > 0) {
+    stepsHtml = `<p class="steps-label" style="color:${ac}">Doporučené první kroky — pro váš typ výzvy</p>
+    <div class="steps-list">`;
+    steps.forEach((s,i) => {
+      stepsHtml += `<div class="step-item">
+        <div class="step-num" style="background:${ac}">${i+1}</div>
+        <div><div class="step-name">${s.n}</div><div class="step-desc">${s.p}</div></div>
+      </div>`;
+    });
+    stepsHtml += '</div>';
+  }
+  document.getElementById('steps-section').innerHTML = stepsHtml;
+
+  // Next step
+  const nsBox = document.getElementById('next-step-box');
+  nsBox.style.background = hexAlpha(ac, 0.08);
+  nsBox.style.borderColor = hexAlpha(ac, 0.25);
+  document.getElementById('ns-label').style.color = ac;
+  document.getElementById('ns-label').textContent = 'Váš další krok';
+  document.getElementById('next-step-text').textContent = data.dalsiKrok;
+
+  // Upgrade hint
+  const upgradeBox = document.getElementById('upgrade-box');
+  if (currentResult < 3) {
+    const nextLvl = currentResult + 1;
+    upgradeBox.innerHTML = `<div class="upgrade-box">
+      <span class="arrow">↑</span>
+      <p><strong>Kdy přejít na vyšší úroveň?</strong> Pokud se situace zhorší, získáte dotační prostředky nebo se ukáže potřeba systémovějšího přístupu, vraťte se k průvodci pro doporučení Úrovně ${nextLvl}.</p>
+    </div>`;
+  } else {
+    upgradeBox.innerHTML = '';
+  }
+
+  // Sources
+  let srcHtml = `<p class="section-label">Užitečné zdroje a kontakty</p>`;
+  data.zdroje.forEach(z => {
+    srcHtml += `<div class="source-row">
+      <span class="source-tag" style="background:${hexAlpha(ac,0.12)};color:${ac}">${z.s}</span>
+      <span style="opacity:0.8">${z.t}</span>
+    </div>`;
+  });
+  document.getElementById('sources-list').innerHTML = srcHtml;
+
+  // Literature
+  renderLiterature(data, ac, false);
+}
+
+function renderLiterature(data, ac, expanded) {
+  const lit = expanded ? data.literatura : data.literatura.slice(0,3);
+  let html = `<p class="lit-label" style="color:${ac}">Doporučená literatura</p><div class="lit-list">`;
+  lit.forEach(l => {
+    html += `<div class="lit-item" style="border-left-color:${ac}">
+      <div class="lit-title">${l.titul}</div>
+      <div class="lit-author" style="color:${ac}">${l.autor}</div>
+      <div class="lit-desc">${l.popis}</div>
+      <div class="lit-url">→ ${l.url}</div>
+    </div>`;
+  });
+  html += '</div>';
+  if (data.literatura.length > 3) {
+    const remaining = data.literatura.length - 3;
+    html += `<button class="btn-show-more" style="border-color:${ac};color:${ac}" onclick="toggleLit()">${expanded ? '▲ Zobrazit méně' : `▼ Všechny zdroje (${remaining} dalších)`}</button>`;
+  }
+  document.getElementById('lit-section').innerHTML = html;
+}
+
+function toggleLit() {
+  litExpanded = !litExpanded;
+  const data = RESULT_DATA[currentResult];
+  renderLiterature(data, data.ac, litExpanded);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// BREADCRUMB
+// ══════════════════════════════════════════════════════════════════
+
+function renderBreadcrumb(elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (history.length === 0) { el.innerHTML = ''; return; }
+  let html = '';
+  history.forEach((h, i) => {
+    html += `<span class="bc-tag">${getLabel(h.nodeId, h.answerId)}</span>`;
+    if (i < history.length - 1) html += `<span class="bc-sep">›</span>`;
+  });
+  html += `<span class="bc-sep">›</span>`;
+  el.innerHTML = html;
+}
+</script>
+</body>
+</html>
