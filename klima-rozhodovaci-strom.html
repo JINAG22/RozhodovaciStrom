@@ -384,9 +384,9 @@
   <div id="view-intro" class="view active">
     <div class="intro-header">
       <img src="Be_Ready_logo.png" style="height:150px; margin-bottom:12px; display:block;">
-      <span class="pill pill-red">Nástroj pro zastupitele obcí</span>
-      <h1>Adaptace veřejných prostranství<br>na změnu klimatu</h1>
-      <p>Průvodce diagnostikuje klimatickou výzvu vaší obce a nasměruje vás k odpovídajícímu řešení — od rychlých opatření přes krajinářský průzkum až po urbanistickou transformaci.</p>
+      <span class="pill pill-red">Nástroj pro starosty a zastupitele obcí</span>
+      <h1>Rozhodovací strom: Adaptace veřejných prostranství<br>na změnu klimatu</h1>
+      <p>Průvodce diagnostikuje klimatickou výzvu Vaší obce a nasměruje vás k odpovídajícímu řešení, od lokálních opatření přes krajinářsko-architektonický průzkum až po komplexní urbanistickou transformaci.</p>
     </div>
 
     <div class="stat-grid">
@@ -408,20 +408,20 @@
       <div class="box-label">Jak průvodce funguje</div>
       <div class="phase-row">
         <span class="pill pill-red" style="flex-shrink:0;margin-top:2px">Fáze 1</span>
-        <p><strong>Výzva</strong> — Teplo, záplavy nebo sucho — kde a jak naléhavě?</p>
+        <p><strong>Výzva</strong> — Přehřívání, záplavy nebo sucho: kde a jak naléhavě?</p>
       </div>
       <div class="phase-row">
         <span class="pill pill-blue" style="flex-shrink:0;margin-top:2px">Fáze 2</span>
-        <p><strong>Kapacity</strong> — Rozpočet, odbornost a kde potřebujete pomoc.</p>
+        <p><strong>Kapacity:</strong>Rozpočet, odbornost a kde potřebujete pomoc.</p>
       </div>
       <div class="phase-row" style="margin-bottom:0">
         <span class="pill pill-dark" style="flex-shrink:0;margin-top:2px">Fáze 3</span>
-        <p><strong>Záměr</strong> — Rychlé výsledky, odborný plán nebo transformace?</p>
+        <p><strong>Záměr</strong>Rychlá reakce, odborný plán nebo komplexní transformace?</p>
       </div>
     </div>
 
-    <button class="btn-start" onclick="startApp()">Zahájit průvodce →</button>
-    <p class="start-note">2–4 otázky · Přibližně 2 minuty · Vaše odpovědi nejsou nikam odesílány</p>
+    <button class="btn-start" onclick="startApp()">Zahájit průchod rozhodovacím stromem →</button>
+    <p class="start-note">2–4 otázky · Přibližně 4 minuty · Vaše odpovědi nejsou nikam odesílány</p>
   </div>
 
   <!-- ── QUESTION ── -->
@@ -481,13 +481,13 @@
 const TREE = {
   problem: {
     fazeLabel:"Porozumění výzvě", fazeIndex:0,
-    otazka:"Jaký klimatický problém je ve vaší obci nejviditelnější?",
-    napoveda:"Vyberte výzvu, která dnes nejvíce ovlivňuje vaše obyvatele.",
+    otazka:"Jaký klimatický problém je ve Vaší obci nejviditelnější?",
+    napoveda:"Vyberte klimatický problém, který dnes nejvíce ovlivňuje vaše obyvatele.",
     moznosti:[
-      {id:"teplo",   text:"Nadměrné vedro a přehřívání prostorů",         popis:"Tepelný ostrov, chybí stín, obyvatelé se vyhýbají venku pobývat",  next:"nalehavost_ostatni"},
+      {id:"teplo",   text:"Nadměrné vedro a přehřívání veřejného prostravtsví",         popis:"Lokální tepelný ostrov, chybí stín, obyvatelé se vyhýbají tomu pobývat venku",  next:"nalehavost_ostatni"},
       {id:"dest",    text:"Přívalové srážky, záplavy a rychlý odtok vody", popis:"Přetížená kanalizace, zaplavené ulice, srážky se nevyužívají",      next:"nalehavost_ostatni"},
       {id:"sucho",   text:"Sucho, umírající nebo chybějící zeleň",         popis:"Stresovaná vegetace, chřadnoucí stromy, nedostatek vody pro zálivku",next:"nalehavost_ostatni"},
-      {id:"vsechno", text:"Kombinace více klimatických stresů najednou",   popis:"Vedro, záplavy i sucho — obec řeší více výzev současně",            next:"nalehavost_vsechno"},
+      {id:"vsechno", text:"Kombinace více klimatických stresů najednou",   popis:"Vedro, záplavy i sucho aneb obec řeší více výzev současně",            next:"nalehavost_vsechno"},
     ],
   },
   nalehavost_vsechno:{
@@ -524,7 +524,7 @@ const TREE = {
   nalehavost_ostatni:{
     fazeLabel:"Porozumění výzvě", fazeIndex:0,
     otazka:"Jak naléhavě obyvatelé tento problém pociťují?",
-    napoveda:"Buďte upřímní — tato odpověď přímo určuje doporučený postup.",
+    napoveda:"Buďte upřímní, tato odpověď přímo určuje doporučený postup.",
     moznosti:[
       {id:"kriticke",   text:"Způsobuje vážné škody nebo zdravotní rizika",  popis:"Škody na majetku, zdravotní dopady, viditelná krize",             next:"kde_ostatni"},
       {id:"zhorsuje",   text:"Každý rok se situace zhoršuje, lidé si stěžují",popis:"Rostoucí nespokojenost, viditelné zhoršení prostředí",           next:{result:2}},
