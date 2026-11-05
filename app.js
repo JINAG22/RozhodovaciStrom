@@ -1,12 +1,12 @@
 /* Průvodce adaptací obecního veřejného prostoru – aplikace
-   Data: data/pruvodce.json (export ze sešitu průvodce, scripts/export_data.py).
+   Data: pruvodce.json (export ze sešitu průvodce, scripts/export_data.py).
    Pravidla R01–R18 odpovídají listu Pravidla v sešitu a engine2.py. */
 (function () {
 'use strict';
 let D = null;
 const app = document.getElementById('app');
 const OK = {T:{n:'Teplo',c:'var(--T)',t:'var(--Tt)'},V:{n:'Voda',c:'var(--V)',t:'var(--Vt)'},Z:{n:'Zeleň',c:'var(--Z)',t:'var(--Zt)'},K:{n:'Krajina a půda',c:'var(--K)',t:'var(--Kt)'},S:{n:'Spolupráce',c:'var(--S)',t:'var(--St)'}};
-const IMG = {T:'img/teplo.png',V:'img/voda.png',Z:'img/zelen.png',K:'img/krajina.png'};
+const IMG = {T:'teplo.png',V:'voda.png',Z:'zelen.png',K:'krajina.png'};
 const TIT = {T:'Rozpálená náves',V:'Sucho i přívaly',Z:'Chřadnoucí stromy',K:'Bahno a prach z polí'};
 const POP = {T:'V létě se na návsi, u zastávky ani na hřišti nedá vydržet. Dlažba a asfalt sálají ještě večer.',V:'Po bouřce teče voda ulicí, v létě vysychá potok i studny. Dešťovka končí v kanále.',Z:'Stromy usychají, trávníky hnědnou a uschlé stromy nikdo nenahrazuje.',K:'Po bouřce teče z polí bahno do ulic, v suchu se práší. Chybí meze a aleje.'};
 const HR = {1:'KR',2:'OB',3:'OB',4:'NAD'};
@@ -128,7 +128,7 @@ function vIntro(){
   '<p style="margin:0;font-size:16px;max-width:470px">Pět krátkých otázek o vaší obci. Na konci dostanete plán – s čím začít ještě tento týden a co dál.</p>' +
   '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn dark" href="#/q1">Začít</a><a class="btn" href="#/priklady">Prohlédnout příklady</a></div>' +
   '<span class="small">asi 5 minut · odpovědi zůstávají jen ve vašem prohlížeči · <a href="#/zdroje">z čeho průvodce vychází</a></span></div>' +
-  '<div class="art" aria-hidden="true"><div class="circle-img c-obec"><img src="img/obec.png" alt=""></div><div class="circle-img c-kraj"><img src="img/krajina-uvod.png" alt=""></div></div></div>';
+  '<div class="art" aria-hidden="true"><div class="circle-img c-obec"><img src="obec.png" alt=""></div><div class="circle-img c-kraj"><img src="krajina-uvod.png" alt=""></div></div></div>';
 }
 function vQ1(){
   const o = [['do 500',130,'často bez úředníka'],['500–2 500',165,'menší projekty s dotací'],['2 500–10 000',200,'větší investice, vlastní strategie']];
@@ -379,5 +379,5 @@ app.addEventListener('click', (e) => {
   else if (a === 'fmine') set({f: {vel: S.vel, okr: S.okr[0], r: 'vše', m: 'vše'}});
 });
 app.addEventListener('change', (e) => { const s = e.target.closest('[data-f]'); if (s) { const f = Object.assign({}, S.f); f[s.dataset.f] = s.value; set({f}); } });
-fetch('data/pruvodce.json').then((r) => r.json()).then((d) => { D = d; render(); }).catch(() => { app.innerHTML = '<p style="padding:40px">Data průvodce se nepodařilo načíst. Zkuste stránku obnovit.</p>'; });
+fetch('pruvodce.json?v=' + Date.now().toString().slice(0, 7)).then((r) => r.json()).then((d) => { D = d; render(); }).catch(() => { app.innerHTML = '<p style="padding:40px">Data průvodce se nepodařilo načíst. Zkuste stránku obnovit.</p>'; });
 })();
